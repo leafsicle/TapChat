@@ -63,56 +63,7 @@ class _MyHomePageState extends State<MyHomePage> {
   String _result = '';
   Timer? timer = Timer(Duration.zero, () {});
   Timer? mainTimer = Timer(Duration.zero, () {});
-
-  @override
-  void dispose() {
-    timer?.cancel();
-    mainTimer?.cancel();
-    super.dispose();
-  }
-
-  void _restartMainTimer() {
-    if (mainTimer != null && mainTimer!.isActive) {
-      mainTimer!.cancel();
-    }
-    mainTimer = Timer(const Duration(seconds: 1), () {
-      // Timer callback: Perform the check after 3 seconds of no input
-      _checkMessageContents();
-    });
-  }
-
-  // play the beep noise!
-  void _playBeep() {
-    FlutterBeep.beep();
-  }
-
-  void _playSecretBeep() {
-    FlutterBeep.playSysSound(iOSSoundIDs.AudioToneBusy);
-  }
-
-  void _clearMessage() {
-    setState(() {
-      _message = '';
-      _restartMainTimer();
-    });
-  }
-
-  void _setResult(String result) {
-    setState(() {
-      _result = result;
-    });
-  }
-
-  void _checkMessageContents() {
-    if (_message.isNotEmpty) {
-      final result = checkMessage();
-      _setResult(result);
-      _clearMessage();
-    }
-  }
-
-  // create a method that will check the value of the message state
-  // and compare it to the dictionary
+  Timer? clearMessageTimer = Timer(Duration.zero, () {});
   String checkMessage() {
     // create a dictionary
     final morseCode = {
@@ -146,6 +97,75 @@ class _MyHomePageState extends State<MyHomePage> {
     return morseCode[_message] ?? '?';
   }
 
+  @override
+  void dispose() {
+    timer?.cancel();
+    mainTimer?.cancel();
+    super.dispose();
+  }
+
+  void _restartMainTimer() {
+    if (mainTimer != null && mainTimer!.isActive) {
+      mainTimer!.cancel();
+    }
+    mainTimer = Timer(const Duration(milliseconds: 800), () {
+      // Timer callback: Perform the check after 3 seconds of no input
+      _checkMessageContents();
+    });
+    // create anothe timer to clear the secret message after 5 seconds without activity
+    if (clearMessageTimer != null && clearMessageTimer!.isActive) {
+      clearMessageTimer!.cancel();
+    }
+    clearMessageTimer = Timer(const Duration(seconds: 3), () {
+      // Timer callback: Perform the check after 3 seconds of no input
+      _clearSecretMessage();
+    });
+  }
+
+  void _vibrate() {
+    FlutterBeep.playSysSound(iOSSoundIDs.Vibrate);
+  }
+
+  // play the beep noise!
+  void _playBeep() {
+    FlutterBeep.playSysSound(iOSSoundIDs.AudioTonePathAcknowledge);
+    _vibrate();
+  }
+
+  void _playLongTone() {
+    FlutterBeep.playSysSound(iOSSoundIDs.AudioToneBusy);
+    _vibrate();
+  }
+
+  void _clearMessage() {
+    setState(() {
+      _message = '';
+      _restartMainTimer();
+    });
+  }
+
+  void _clearSecretMessage() {
+    setState(() {
+      _secretMesage = '';
+      _restartMainTimer();
+    });
+  }
+
+  void _setResult(String result) {
+    setState(() {
+      _result = result;
+      _secretMesage += result;
+    });
+  }
+
+  void _checkMessageContents() {
+    if (_message.isNotEmpty) {
+      final result = checkMessage();
+      _setResult(result);
+      _clearMessage();
+    }
+  }
+
   void _addDotToMessage() {
     setState(() {
       _message += '.';
@@ -166,7 +186,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void onLongPress() {
     _addDashToMessage();
-    _playSecretBeep();
+    _playLongTone();
     _restartMainTimer();
   }
 
@@ -180,11 +200,11 @@ class _MyHomePageState extends State<MyHomePage> {
     );
     const secretTextStyle = TextStyle(
       fontFamily: 'Spartan MB',
-      fontSize: 20.0,
+      fontSize: 100.0,
       decoration: null,
-      color: Colors.orange,
+      color: Color.fromARGB(255, 0, 0, 0),
     );
-    double? gap = 10;
+    double? gap = 20;
 
     return GestureDetector(
       onTapDown: (_) {
@@ -217,25 +237,21 @@ class _MyHomePageState extends State<MyHomePage> {
         padding: const EdgeInsets.only(top: 450),
         width: 200,
         height: 50,
-        color: const Color.fromARGB(255, 98, 113, 229),
+        color: const Color.fromARGB(255, 255, 137, 41),
         // add to the child a Text widget that displays the string state
         child: Column(
           children: [
-            if (_secretMesage.isNotEmpty) ...[
-              Center(
-                child: Text(_secretMesage, style: otherTextStyle),
-              ),
-              SizedBox(height: gap),
-            ],
             Center(
               child: Text(_message, style: otherTextStyle),
             ),
             SizedBox(height: gap),
-            if (_result.isNotEmpty) ...[
+            if (_secretMesage.isNotEmpty) ...[
               Center(
-                child: Text(_result, style: otherTextStyle),
+                child: Text(_secretMesage, style: secretTextStyle),
               ),
             ],
+            SizedBox(height: gap),
+            // add a button to clear the message
           ],
         ),
       ),
