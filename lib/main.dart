@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
-import 'package:vibration/vibration.dart';
+import 'package:flutter_beep/flutter_beep.dart';
 
 void main() {
   runApp(const MyApp());
@@ -58,10 +58,12 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  String _secretMesage = '';
   String _message = '';
   String _result = '';
   Timer? timer = Timer(Duration.zero, () {});
   Timer? mainTimer = Timer(Duration.zero, () {});
+
   @override
   void dispose() {
     timer?.cancel();
@@ -77,6 +79,15 @@ class _MyHomePageState extends State<MyHomePage> {
       // Timer callback: Perform the check after 3 seconds of no input
       _checkMessageContents();
     });
+  }
+
+  // play the beep noise!
+  void _playBeep() {
+    FlutterBeep.beep();
+  }
+
+  void _playSecretBeep() {
+    FlutterBeep.playSysSound(iOSSoundIDs.AudioToneBusy);
   }
 
   void _clearMessage() {
@@ -149,27 +160,29 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void onShortPress() {
     _addDotToMessage();
+    _playBeep();
     _restartMainTimer();
   }
 
   void onLongPress() {
     _addDashToMessage();
+    _playSecretBeep();
     _restartMainTimer();
   }
 
   @override
   Widget build(BuildContext context) {
-    const kTempTextStyle = TextStyle(
-      fontFamily: 'Spartan MB',
-      fontSize: 100.0,
-      decoration: null,
-      color: Colors.black,
-    );
     const otherTextStyle = TextStyle(
       fontFamily: 'Spartan MB',
       fontSize: 20.0,
       decoration: null,
       color: Colors.black,
+    );
+    const secretTextStyle = TextStyle(
+      fontFamily: 'Spartan MB',
+      fontSize: 20.0,
+      decoration: null,
+      color: Colors.orange,
     );
     double? gap = 10;
 
@@ -208,16 +221,19 @@ class _MyHomePageState extends State<MyHomePage> {
         // add to the child a Text widget that displays the string state
         child: Column(
           children: [
-            const Center(
-              child: Text('HAM', style: otherTextStyle),
-            ),
+            if (_secretMesage.isNotEmpty) ...[
+              Center(
+                child: Text(_secretMesage, style: otherTextStyle),
+              ),
+              SizedBox(height: gap),
+            ],
             Center(
-              child: Text(_message, style: kTempTextStyle),
+              child: Text(_message, style: otherTextStyle),
             ),
             SizedBox(height: gap),
             if (_result.isNotEmpty) ...[
               Center(
-                child: Text(_result, style: kTempTextStyle),
+                child: Text(_result, style: otherTextStyle),
               ),
             ],
           ],
