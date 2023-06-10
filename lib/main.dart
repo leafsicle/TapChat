@@ -59,6 +59,9 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   String _message = '';
+  String _result = '';
+  Timer? timer = Timer(Duration.zero, () {});
+  Timer? mainTimer = Timer(Duration.zero, () {});
   @override
   void dispose() {
     timer?.cancel();
@@ -70,7 +73,7 @@ class _MyHomePageState extends State<MyHomePage> {
     if (mainTimer != null && mainTimer!.isActive) {
       mainTimer!.cancel();
     }
-    mainTimer = Timer(const Duration(seconds: 2), () {
+    mainTimer = Timer(const Duration(seconds: 1), () {
       // Timer callback: Perform the check after 3 seconds of no input
       _checkMessageContents();
     });
@@ -79,59 +82,21 @@ class _MyHomePageState extends State<MyHomePage> {
   void _clearMessage() {
     setState(() {
       _message = '';
+      _restartMainTimer();
+    });
+  }
+
+  void _setResult(String result) {
+    setState(() {
+      _result = result;
     });
   }
 
   void _checkMessageContents() {
-    if (_isMessageComplete()) {
-      print('Message is complete');
+    if (_message.isNotEmpty) {
       final result = checkMessage();
-      print('Result: $result');
-    }
-  }
-
-  void _addDotToMessage() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _message += '.';
-    });
-  }
-
-  void _addDashToMessage() {
-    setState(() {
-      _message += '-';
-    });
-  }
-
-  void onShortPress() {
-    _addDotToMessage();
-    _restartMainTimer();
-  }
-
-  void onLongPress() async {
-    // check if device has vibrator
-    bool? canVibrate = await Vibration.hasVibrator();
-    if (canVibrate != null && canVibrate) {
-      Vibration.vibrate(
-        pattern: [500],
-      );
-      Vibration.cancel();
-    }
-    _addDashToMessage();
-    _restartMainTimer();
-  }
-
-  // create a bool method that will look at the length of the message state
-  // and return false if the length == 5
-  bool _isMessageComplete() {
-    if (_message.length > 1) {
-      return true;
-    } else {
-      return false;
+      _setResult(result);
+      _clearMessage();
     }
   }
 
@@ -170,8 +135,27 @@ class _MyHomePageState extends State<MyHomePage> {
     return morseCode[_message] ?? '?';
   }
 
-  Timer? timer = Timer(Duration.zero, () {});
-  Timer? mainTimer = Timer(Duration.zero, () {});
+  void _addDotToMessage() {
+    setState(() {
+      _message += '.';
+    });
+  }
+
+  void _addDashToMessage() {
+    setState(() {
+      _message += '-';
+    });
+  }
+
+  void onShortPress() {
+    _addDotToMessage();
+    _restartMainTimer();
+  }
+
+  void onLongPress() {
+    _addDashToMessage();
+    _restartMainTimer();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -188,6 +172,7 @@ class _MyHomePageState extends State<MyHomePage> {
       color: Colors.black,
     );
     double? gap = 10;
+
     return GestureDetector(
       onTapDown: (_) {
         timer = Timer(
@@ -207,9 +192,8 @@ class _MyHomePageState extends State<MyHomePage> {
           onShortPress();
         }
         // new var to catch bool method
-        bool isComplete = _isMessageComplete();
-        if (isComplete) {
-          print('Message is complete');
+
+        if (_message.isNotEmpty) {
           // check the value of message and compare it to the dictionary
           // if the message is in the dictionary, display the corresponding letter
           // if the message is not in the dictionary, display a ?
@@ -220,17 +204,22 @@ class _MyHomePageState extends State<MyHomePage> {
         padding: const EdgeInsets.only(top: 450),
         width: 200,
         height: 50,
-        color: Color.fromARGB(255, 98, 113, 229),
+        color: const Color.fromARGB(255, 98, 113, 229),
         // add to the child a Text widget that displays the string state
         child: Column(
           children: [
-            SizedBox(height: gap),
             const Center(
-              child: Text('Click here', style: otherTextStyle),
+              child: Text('HAM', style: otherTextStyle),
             ),
             Center(
               child: Text(_message, style: kTempTextStyle),
             ),
+            SizedBox(height: gap),
+            if (_result.isNotEmpty) ...[
+              Center(
+                child: Text(_result, style: kTempTextStyle),
+              ),
+            ],
           ],
         ),
       ),
