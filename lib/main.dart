@@ -93,6 +93,28 @@ class _MyHomePageState extends State<MyHomePage> {
       '-..-': 'X',
       '-.--': 'Y',
       '--..': 'Z',
+      '.----': '1',
+      '..---': '2',
+      '...--': '3',
+      '....-': '4',
+      '.....': '5',
+      '-....': '6',
+      '--...': '7',
+      '---..': '8',
+      '----.': '9',
+      '-----': '0',
+      '.-.-.-': '.',
+      '--..--': ',',
+      '..--..': '?',
+      '-....-': '-',
+      '-..-.': '/',
+      '-.--.': '(',
+      '-.--.-': ')',
+      '.-...': '&',
+      '---...': ':',
+      '-.-.-.': ';',
+      '-...-': '=',
+      '.-.-.': '+',
     };
     return morseCode[_message] ?? '?';
   }
@@ -205,7 +227,6 @@ class _MyHomePageState extends State<MyHomePage> {
       color: Color.fromARGB(255, 0, 0, 0),
     );
     double? gap = 20;
-
     return GestureDetector(
       onTapDown: (_) {
         timer = Timer(
