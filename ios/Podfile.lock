@@ -1,21 +1,21 @@
 PODS:
   - Flutter (1.0.0)
-  - vibration (1.7.5):
+  - flutter_beep (0.0.1):
     - Flutter
 
 DEPENDENCIES:
   - Flutter (from `Flutter`)
-  - vibration (from `.symlinks/plugins/vibration/ios`)
+  - flutter_beep (from `.symlinks/plugins/flutter_beep/ios`)
 
 EXTERNAL SOURCES:
   Flutter:
     :path: Flutter
-  vibration:
-    :path: ".symlinks/plugins/vibration/ios"
+  flutter_beep:
+    :path: ".symlinks/plugins/flutter_beep/ios"
 
 SPEC CHECKSUMS:
   Flutter: f04841e97a9d0b0a8025694d0796dd46242b2854
-  vibration: 7d883d141656a1c1a6d8d238616b2042a51a1241
+  flutter_beep: 54fb393b22dfa0f0e4573c81b1c74dd71c4e5af8
 
 PODFILE CHECKSUM: 70d9d25280d0dd177a5f637cdb0f0b0b12c6a189
 
