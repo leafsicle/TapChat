@@ -93,6 +93,7 @@ class _MyHomePageState extends State<MyHomePage> {
       '-..-': 'X',
       '-.--': 'Y',
       '--..': 'Z',
+      '.-----': ' ',
       '.----': '1',
       '..---': '2',
       '...--': '3',
